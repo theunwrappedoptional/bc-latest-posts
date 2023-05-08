@@ -17,5 +17,15 @@
   "textdomain": "latest-posts",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "style": "file:./style-index.css",
+  "attributes": {
+    "numberOfPosts": {
+      "type": "number",
+      "default": 5
+    },
+    "displayFeaturedImage": {
+      "type": "boolean",
+      "default": true
+    }
+  }
 }
