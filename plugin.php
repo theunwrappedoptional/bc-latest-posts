@@ -32,7 +32,7 @@ function bc_render_latest_posts_block($attributes) {
 
 	$recent_posts = get_posts( $args );
 
-	$posts = '<ul '. get_block_wrapper_attributes().'>';
+	$posts = '<ul '. get_block_wrapper_attributes() .'>';
 	
 	foreach($recent_posts as $post) {
 
