@@ -21,7 +21,7 @@
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
 
-function blocks_course_render_latest_posts_block($attributes) {
+function bc_render_latest_posts_block($attributes) {
 	// var_dump($attributes);
 	// return 'Dynamic Content';
 
@@ -63,9 +63,9 @@ function blocks_course_render_latest_posts_block($attributes) {
 
 }
 
-function blocks_course_latest_posts_block_init() {
+function bc_latest_posts_block_init() {
 	register_block_type( __DIR__ . '/build', array(
-		"render_callback" => "blocks_course_render_latest_posts_block"
+		"render_callback" => "bc_render_latest_posts_block"
 	));
 }
-add_action( 'init', 'blocks_course_latest_posts_block_init' );
+add_action( 'init', 'bc_latest_posts_block_init' );
