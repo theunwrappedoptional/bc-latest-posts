@@ -35,7 +35,13 @@ import './editor.scss';
  */
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { numberOfPosts, displayFeaturedImage, order, orderBy } = attributes;
+	const { numberOfPosts, displayFeaturedImage, order, orderBy, categories } =
+		attributes;
+
+	const catIDs =
+		categories && categories.length > 0
+			? categories.map( ( cat ) => cat.id )
+			: [];
 	const posts = useSelect(
 		( select ) => {
 			return select( 'core' ).getEntityRecords( 'postType', 'post', {
@@ -43,10 +49,38 @@ export default function Edit( { attributes, setAttributes } ) {
 				_embed: true,
 				order,
 				orderby: orderBy,
+				categories: catIDs,
 			} );
 		},
-		[ numberOfPosts, order, orderBy ]
+		[ numberOfPosts, order, orderBy, categories ]
 	);
+
+	const allCats = useSelect( ( select ) => {
+		return select( 'core' ).getEntityRecords( 'taxonomy', 'category', {
+			per_page: -1,
+		} );
+	}, [] );
+
+	const catSuggestions = {};
+	if ( allCats ) {
+		for ( let i = 0; i < allCats.length; i++ ) {
+			const cat = allCats[ i ];
+			catSuggestions[ cat.name ] = cat;
+		}
+	}
+
+	const onCategoryChange = ( values ) => {
+		const hasNoSuggestions = values.some(
+			( value ) => typeof value === 'string' && ! catSuggestions[ value ]
+		);
+		if ( hasNoSuggestions ) return;
+
+		const updatedCats = values.map( ( token ) => {
+			return typeof token === 'string' ? catSuggestions[ token ] : token;
+		} );
+
+		setAttributes( { categories: updatedCats } );
+	};
 
 	const onDisplayFeaturedImageChange = ( value ) => {
 		setAttributes( { displayFeaturedImage: value } );
@@ -78,6 +112,9 @@ export default function Edit( { attributes, setAttributes } ) {
 						onOrderChange={ ( value ) =>
 							setAttributes( { order: value } )
 						}
+						categorySuggestions={ catSuggestions }
+						selectedCategories={ categories }
+						onCategoryChange={ onCategoryChange }
 					/>
 				</PanelBody>
 			</InspectorControls>

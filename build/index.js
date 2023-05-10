@@ -71,16 +71,42 @@ function Edit(_ref) {
     numberOfPosts,
     displayFeaturedImage,
     order,
-    orderBy
+    orderBy,
+    categories
   } = attributes;
+  const catIDs = categories && categories.length > 0 ? categories.map(cat => cat.id) : [];
   const posts = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useSelect)(select => {
     return select('core').getEntityRecords('postType', 'post', {
       per_page: numberOfPosts,
       _embed: true,
       order,
-      orderby: orderBy
+      orderby: orderBy,
+      categories: catIDs
     });
-  }, [numberOfPosts, order, orderBy]);
+  }, [numberOfPosts, order, orderBy, categories]);
+  const allCats = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_4__.useSelect)(select => {
+    return select('core').getEntityRecords('taxonomy', 'category', {
+      per_page: -1
+    });
+  }, []);
+  const catSuggestions = {};
+  if (allCats) {
+    for (let i = 0; i < allCats.length; i++) {
+      const cat = allCats[i];
+      catSuggestions[cat.name] = cat;
+    }
+  }
+  ;
+  const onCategoryChange = values => {
+    const hasNoSuggestions = values.some(value => typeof value === 'string' && !catSuggestions[value]);
+    if (hasNoSuggestions) return;
+    const updatedCats = values.map(token => {
+      return typeof token === 'string' ? catSuggestions[token] : token;
+    });
+    setAttributes({
+      categories: updatedCats
+    });
+  };
   const onDisplayFeaturedImageChange = value => {
     setAttributes({
       displayFeaturedImage: value
@@ -107,7 +133,10 @@ function Edit(_ref) {
     order: order,
     onOrderChange: value => setAttributes({
       order: value
-    })
+    }),
+    categorySuggestions: catSuggestions,
+    selectedCategories: categories,
+    onCategoryChange: onCategoryChange
   }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("ul", (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)(), posts && posts.map(post => {
     const featuredImage = post._embedded && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'].length > 0 && post._embedded['wp:featuredmedia'][0];
     return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("li", {
@@ -312,7 +341,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ (function(module) {
 
-module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"blocks-course/latest-posts","version":"0.1.0","title":"Latest Posts","category":"widgets","icon":"admin-post","description":"Display and filter latest posts.","keywords":["latest","posts"],"supports":{"html":false},"textdomain":"latest-posts","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"numberOfPosts":{"type":"number","default":5},"displayFeaturedImage":{"type":"boolean","default":true},"order":{"type":"string","default":"desc"},"orderBy":{"type":"string","default":"date"}}}');
+module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"blocks-course/latest-posts","version":"0.1.0","title":"Latest Posts","category":"widgets","icon":"admin-post","description":"Display and filter latest posts.","keywords":["latest","posts"],"supports":{"html":false},"textdomain":"latest-posts","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","attributes":{"numberOfPosts":{"type":"number","default":5},"displayFeaturedImage":{"type":"boolean","default":true},"order":{"type":"string","default":"desc"},"orderBy":{"type":"string","default":"date"},"categories":{"type":"array","items":{"type":"object"}}}}');
 
 /***/ })
 

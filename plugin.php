@@ -32,6 +32,10 @@ function bc_render_latest_posts_block($attributes) {
 		'order' => $attributes['order'],
 	);
 
+	if(isset($attributes['categories'])) {
+		$args['category__in'] = array_column($attributes['categories'], 'id');
+	}
+
 	$recent_posts = get_posts( $args );
 
 	$posts = '<ul '. get_block_wrapper_attributes() .'>';
